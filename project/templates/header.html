@@ -1,0 +1,18 @@
+<div id="fh5co-page">
+	<header id="fh5co-header" role="banner">
+		<div class="container">
+			<div class="header-inner">
+				<h1><a href="index.html">Catalog App: Music Albums and Bands </a></h1>
+				<nav role="navigation">
+					<ul>
+						{% if 'username' not in session %}
+						<li class="cta"><a href="{{url_for('showLogin')}}">Login</a></li>
+						{% else %}
+						<li class="cta"><a href="{{url_for('disconnect')}}">Logout</a></li>
+						{% endif %}
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</header>
+</div>

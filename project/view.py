@@ -38,6 +38,7 @@ def showLogin():
 @app.route('/gconnect', methods = ['POST'])
 def gconnect():
     print "reached here"
+    print login_session
     # validating the state token.
     if request.args.get('state') != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -85,7 +86,12 @@ def gconnect():
         return response
 
     stored_access_token = login_session.get('access_token')
+    print "stored access code: %s" % stored_access_token
+
     stored_gplus_id = login_session.get('gplus_id')
+    print "stored gplus: %s" % stored_gplus_id
+
+    print "credentials access code %s" % credentials.access_token
 
     # Now if there is no user present, the above values will be 
     # empty meaning no user is logged in. In case, these values
@@ -100,25 +106,79 @@ def gconnect():
 
     login_session['access_token'] = access_token
     login_session['gplus_id'] = gplus_id
-
+    print login_session['gplus_id']
     # get user info from google api.
-    userinfo_url = 'https://www/googleapis.com/oauth2/v1/userinfo',
+    userinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     result = requests.get(userinfo_url, params=params)
-    data = answer.json()
+    data = result.json()
+    print data
 
+    login_session['provider'] = 'google'
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+    print login_session['provider']
+    print login_session['username']
+    print login_session['picture']
+    print login_session['email']
+
 
     return render_template('homePage')
 
+# google disconnect
+@app.route('/gdisconnect')
+def gdisconnect():
+    # Only disconnect a connected user.
+    print "reached in gdis"
+
+    access_token = login_session.get('access_token')
+    print access_token
+    if access_token is None:
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        print "reaching before response"
+        print response
+        return response
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    if result['status'] == '200':
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        print response
+        return response
+    else:
+        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
+
+@app.route('/disconnect')
+def disconnect():
+	print 'reached in disconnect'
+	if 'provider' in login_session:
+		if login_session['provider'] == 'google':
+			gdisconnect()
+			del login_session['gplus_id']
+			del login_session['access_token']
+			print "deleted"
+		del login_session['username']
+		del login_session['email']
+		del login_session['picture']
+		del login_session['user_id']
+		del login_session['provider']
+		flash("You have successfully been logged out.")
+		return redirect(url_for('homePage'))
+	else:
+		flash('You were not logged in')
+		print 'you are not logged in'
+		return redirect(url_for('homePage'))
 
 @app.route('/')
 def homePage():
-    print CLIENT_ID_GOOGLE
     bands = session.query(Music_Band).all()
-    return render_template('main.html', music_bands = bands)
+    return render_template('album.html', music_bands = bands)
 
 
 if __name__ == '__main__':

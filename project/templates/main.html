@@ -20,50 +20,11 @@
 	</head>
 	<body>
 	
+		<div class='container'>
+			{% block content %}
+			{% endblock %}
+		</div>
 	
-		<div id="fh5co-page">
-		<header id="fh5co-header" role="banner">
-			<div class="container">
-				<div class="header-inner">
-					<h1><a href="index.html">Catalog App: Music Albums and Bands </a></h1>
-					<nav role="navigation">
-						<ul>
-							<li class="cta"><a href="{{url_for('showLogin')}}">Login</a></li>
-						</ul>
-					</nav>
-				</div>
-			</div>
-		</header>
-		</div>
-
-		<div id="fh5co-services-section">
-			<div class="row">
-				<div class="col-md-4 animate-box">
-					<div class="services">
-						<i class="icon-laptop"></i>
-						<div class="desc">
-							<h3>Music Bands</h3>
-							<ul>
-							{% for band in music_bands %}
-								<li>{{ band.name }}</li>
-							{% endfor %}
-							</ul>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-4 animate-box">
-					<div class="services">
-						<i class="icon-server"></i>
-						<div class="desc">
-							<h3>Albums</h3>
-							<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove.</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
 	</body>
 </html>
 

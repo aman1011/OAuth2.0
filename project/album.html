@@ -1,0 +1,31 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+	
+	
+<div id="fh5co-services-section">
+	<div class="row">
+		<div class="col-md-4 animate-box">
+			<div class="services">
+				<i class="icon-laptop"></i>
+				<div class="desc">
+					<h3>Music Bands</h3>
+					<ul>
+					{% for band in music_bands %}
+						<li>{{ band.name }}</li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 animate-box">
+			<div class="services">
+				<i class="icon-server"></i>
+				<div class="desc">
+					<h3>Albums</h3>
+					<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
