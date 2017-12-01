@@ -1,4 +1,3 @@
-
 from sqlalchemy import Column,Integer,String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -19,7 +18,23 @@ class User(Base):
         return pwd_context.verify(password, self.password_hash)
 
 
-engine = create_engine('sqlite:///users.db')
- 
+class Bagel(Base):
+	__tablename__ = 'bagel'
+	id = Column(Integer, primary_key=True)
+	name = Column(String)
+	picture = Column(String)
+	description = Column(String)
+	price = Column(String)
+	@property
+	def serialize(self):
+	    """Return object data in easily serializeable format"""
+	    return {
+	    'name' : self.name,
+	    'picture' : self.picture,
+	    'description' : self.description,
+	    'price' : self.price
+	        }
 
-Base.metadata.create_all(engine)
+
+engine = create_engine('sqlite:///bagelShopNew.db')
+ 
