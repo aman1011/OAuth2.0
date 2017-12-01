@@ -29,13 +29,11 @@ session = DBSession()
 @app.route('/')
 def homePage():
 	print CLIENT_ID_GOOGLE
-	session.add(User(username = 'Agaur'))
+	session.add(Music_Band(name = 'Linkin Park'))
 	session.commit()
-	user = session.query(User).all()
-	print user[0].username
-	session.delete(user[0])
-	session.commit()
-	return render_template('main.html')
+	bands = session.query(Music_Band).all()
+	print bands[0].name
+	return render_template('main.html', music_bands = bands)
 
 
 
