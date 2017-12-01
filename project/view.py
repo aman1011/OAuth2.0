@@ -124,7 +124,7 @@ def gconnect():
     print login_session['email']
 
 
-    return render_template('homePage')
+    return redirect(url_for('homePage'))
 
 # google disconnect
 @app.route('/gdisconnect')
