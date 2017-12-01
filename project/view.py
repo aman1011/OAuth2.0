@@ -25,20 +25,24 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# create anti-forgery state token
+@app.route('/login')
+def showLogin():
+	state = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+	print state
+	login_session['state'] = state
+
+	return render_template('login.html', STATE=state)
+
 
 @app.route('/')
 def homePage():
 	print CLIENT_ID_GOOGLE
-	session.add(Music_Band(name = 'Linkin Park'))
-	session.commit()
 	bands = session.query(Music_Band).all()
-	print bands[0].name
 	return render_template('main.html', music_bands = bands)
 
 
-
-
-
 if __name__ == '__main__':
+	app.secret_key  = 'super_secret_key'
 	app.debug = True
 	app.run(host='0.0.0.0', port=5000)
