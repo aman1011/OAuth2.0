@@ -207,7 +207,8 @@ def disconnect():
 @app.route('/')
 def homePage():
     bands = session.query(Music_Band).all()
-    return render_template('album.html', music_bands = bands)
+    albums = session.query(Album).all()
+    return render_template('album.html', music_bands = bands, albums = albums)
 
 
 if __name__ == '__main__':

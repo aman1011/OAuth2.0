@@ -22,7 +22,11 @@
 					<h4><a href="#">Add Album</a></h4>
 					{% endif %}
 					<h3>Albums</h3>
-					<p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove.</p>
+					<ul>
+						{% for album in albums %}
+							<li>{{ album.name }}</li>
+						{% endfor %}
+					</ul>
 				</div>
 			</div>
 		</div>
