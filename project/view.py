@@ -118,11 +118,29 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+
+    # Check whether the user is in the database.
+    # If not then add the users.
+    try:
+    	user = session.query(User).filter_by(email=login_session['email']).one()
+    	login_session['user_id'] = user.id
+    except:
+    	user = None
+
+    if user is None:
+    	print "reached in None"
+    	session.add(User(username=login_session['username'], picture=login_session['picture'], email=login_session['email']))
+    	session.commit()
+    	newUser = session.query(User).filter_by(email=login_session['email']).one()
+    	print newUser.username
+    	print newUser.id
+    	login_session['user_id'] = newUser.id
+
     print login_session['provider']
     print login_session['username']
     print login_session['picture']
     print login_session['email']
-
+    print login_session['user_id']
 
     return redirect(url_for('homePage'))
 
@@ -160,13 +178,15 @@ def disconnect():
 	if 'provider' in login_session:
 		if login_session['provider'] == 'google':
 			gdisconnect()
+			print login_session['gplus_id']
 			del login_session['gplus_id']
+			print login_session['access_token']
 			del login_session['access_token']
 			print "deleted"
 		del login_session['username']
 		del login_session['email']
 		del login_session['picture']
-		del login_session['user_id']
+		#del login_session['user_id']
 		del login_session['provider']
 		flash("You have successfully been logged out.")
 		return redirect(url_for('homePage'))
