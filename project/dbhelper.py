@@ -84,7 +84,9 @@ for band in Music_Bands:
 #album = session.query(Album).filter_by(id=13).one()
 #session.delete(album)
 #session.commit()
-#albums = session.query(Album).all()
+albums = session.query(Album).all()
+#session.add(Album(name='The sorrow of september', music_band_id=8,user_id=1,description="As as french project, this was the first landmark album from the band"))
+#session.commit()
 for album in albums:
 	print album.id
 	print album.name

@@ -229,7 +229,6 @@ def showBandAlbums(music_band_name):
 		albums = session.query(Album).filter_by(music_band_id=current_music_band.id).all()
 
 		print albums[0].name
-		print albums[1].name
 	except:
 		return "could not get the albums"
 
@@ -263,13 +262,6 @@ def editAlbum(albumId):
 		return url_for('homePage')
 	else:
 		return render_template('editAlbum.html', album=toEditAlbum, bands=bands)
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app.secret_key  = 'super_secret_key'

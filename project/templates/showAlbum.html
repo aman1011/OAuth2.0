@@ -9,7 +9,7 @@
 				<h3>Music Bands</h3>
 				<ul>
 				{% for band in music_bands %}
-					<li>{{ band.name }}</li>
+					<li><a href="{{url_for('showBandAlbums', music_band_name = band.name)}}">{{ band.name }}</a></li>
 				{% endfor %}
 				</ul>
 			</div>
