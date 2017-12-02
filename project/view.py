@@ -234,6 +234,15 @@ def showBandAlbums(music_band_name):
 
 	return render_template('showAlbum.html', currentBand=current_music_band, albums=albums, music_bands=music_bands, number_of_albums=number_of_albums)
 
+@app.route('/catalog/<string:music_band_name>/<string:album_name>/')
+def showAlbumInfo(music_band_name, album_name):
+	try:
+		album = session.query(Album).filter_by(name=album_name).one()
+	except:
+		return "could not get the specific album"
+
+	return render_template('showAlbumInfo.html', album=album)
+
 @app.route('/catalog/<int:albumId>editAlbum/')
 def editAlbum(albumId):
 
