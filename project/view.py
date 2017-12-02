@@ -243,7 +243,7 @@ def showAlbumInfo(music_band_name, album_name):
 
 	return render_template('showAlbumInfo.html', album=album)
 
-@app.route('/catalog/<int:albumId>editAlbum/')
+@app.route('/catalog/<string:albumName>edit/')
 def editAlbum(albumId):
 
 	# check if the user is logged in.
