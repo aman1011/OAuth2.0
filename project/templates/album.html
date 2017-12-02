@@ -26,7 +26,7 @@
 						{% for album in albums %}
 							{% for band in music_bands %}
 								{% if band.id == album.music_band_id %}
-									<li>{{ album.name }} <span>({{band.name}})</span></li>
+									<li><span>{{ album.name }}</span><span style="font-style:italic;color:#666699"> ({{band.name}})</span></li>
 									{{ break }}
 								{% endif %}
 							{% endfor %}
