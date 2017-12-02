@@ -205,10 +205,70 @@ def disconnect():
 		return redirect(url_for('homePage'))
 
 @app.route('/')
+@app.route('/catalog/')
 def homePage():
     bands = session.query(Music_Band).all()
     albums = session.query(Album).all()
     return render_template('album.html', music_bands = bands, albums = albums)
+
+@app.route('/catalog/<string:music_band_name>/albums/')
+def showBandAlbums(music_band_name):
+
+	music_bands = session.query(Music_Band).all()
+	print music_band_name
+	print music_bands[1].name
+	try:
+		current_music_band = session.query(Music_Band).filter_by(name=music_band_name).one()
+		print current_music_band.id
+		print current_music_band.name
+	except:
+		return "Could not get the band"
+
+	# get the albums for the band.
+	try:
+		albums = session.query(Album).filter_by(music_band_id=current_music_band.id).all()
+
+		print albums[0].name
+		print albums[1].name
+	except:
+		return "could not get the albums"
+
+	return render_template('showAlbum.html', currentBand=current_music_band, albums=albums, music_bands=music_bands)
+
+@app.route('/editAlbum<int:albumId>/')
+def editAlbum(albumId):
+
+	# check if the user is logged in.
+	# if not then redirect to the login page
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
+
+	try:
+		toEditAlbum = session.query(Album).filter_by(id=albumId).one()
+		bands = session.query(Music_Band).all()
+	except:
+		return "Could not get the album to edit"
+
+	if request.method == 'POST':
+		if request.args.get('name'):
+			toEditAlbum.name = request.args.get('name')
+		if request.args.get('description'):
+			toEditAlbum.name = request.args.get('description')
+		if request.args.get('music_band_id'):
+			toEditAlbum.name = request.args.get('music_band_id')
+		session.add(toEditAlbum)
+		session.commit()
+		flash('The album' + toEditAlbum.name + 'was successfully edited')
+
+		return url_for('homePage')
+	else:
+		return render_template('editAlbum.html', album=toEditAlbum, bands=bands)
+
+
+
+
+
+
 
 
 if __name__ == '__main__':

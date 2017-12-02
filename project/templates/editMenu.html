@@ -1,0 +1,26 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div>
+	<h3> Edit Album </h3>
+	</br>
+	<form method='POST' action="{{url_for('editAlbum')}}">
+		<h4>Album Name</h4>
+		<input type='text' placeholder="{{album.name}}" size=30>
+		</br>
+		<h4>Description</h4>
+		<input type='text' placeholder='Description' size=30>
+		</br>
+		<h4> Music Band</h4>
+		<select>
+			{% for band in bands %}
+				<option value='{{band.name}}'>{{band.name}}</option>
+			{% endfor %}
+		</select>
+		<input type='submit' value='Submit'>
+	</form>
+	<a href="{{url_for('homePage')}}">Cancel</a>
+</div>
+
+

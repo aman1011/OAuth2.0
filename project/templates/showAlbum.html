@@ -1,0 +1,31 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div id="fh5co-services-section">
+	<div class="row">
+		<div class="col-md-4 animate-box">
+			<div class="services">
+				<h3>Music Bands</h3>
+				<ul>
+				{% for band in music_bands %}
+					<li>{{ band.name }}</li>
+				{% endfor %}
+				</ul>
+			</div>
+		</div>
+		<div class="col-md-4 animate-box">
+			<div class="services">
+				<div class="desc">
+					<h3>{{currentBand.name}} Albums</h3>
+					<ul>
+						{% for album in albums %}
+							<li>{{ album.name }}</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

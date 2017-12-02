@@ -81,7 +81,10 @@ for band in Music_Bands:
 #session.add(Album(name="That's the Spirit", music_band_id=7, user_id=1, description="That's the Spirit is the fifth studio album by British rock band Bring Me the Horizon. The album was released on 11 September 2015,[1] and marks a departure from the group's metalcore roots, in favour of a less aggressive rock style."))
 #session.commit()
 
-albums = session.query(Album).all()
+#album = session.query(Album).filter_by(id=13).one()
+#session.delete(album)
+#session.commit()
+#albums = session.query(Album).all()
 for album in albums:
 	print album.id
 	print album.name
