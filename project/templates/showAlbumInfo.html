@@ -9,13 +9,15 @@
 			<h5><span style="font-style:italic">Description</span>: {{album.description}}</h5>
 		</div>
 	</div>
+	{% if 'username' in session %}
+		<div class="row">
+			<a href="">Edit</a>
+			<a href="">Delete</a>
+		</div>
+		</br>
+	{% endif %}
 	<div class="row">
-		<a href="">Edit</a>
-		<a href="">Delete</a>
-	</div>
-	</br>
-	<div class="row">
-		<a href="">Back</a>
+		<a href="{{url_for('showBandAlbums', music_band_name = music_band_name)}}">Back</a>
 	</div>
 </div>
 {% endblock %}

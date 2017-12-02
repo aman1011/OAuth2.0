@@ -241,7 +241,7 @@ def showAlbumInfo(music_band_name, album_name):
 	except:
 		return "could not get the specific album"
 
-	return render_template('showAlbumInfo.html', album=album)
+	return render_template('showAlbumInfo.html', album=album, music_band_name=music_band_name)
 
 @app.route('/catalog/<string:albumName>edit/')
 def editAlbum(albumId):
