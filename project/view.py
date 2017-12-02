@@ -227,14 +227,14 @@ def showBandAlbums(music_band_name):
 	# get the albums for the band.
 	try:
 		albums = session.query(Album).filter_by(music_band_id=current_music_band.id).all()
-
+		number_of_albums = session.query(Album).filter_by(music_band_id=current_music_band.id).count()
 		print albums[0].name
 	except:
 		return "could not get the albums"
 
-	return render_template('showAlbum.html', currentBand=current_music_band, albums=albums, music_bands=music_bands)
+	return render_template('showAlbum.html', currentBand=current_music_band, albums=albums, music_bands=music_bands, number_of_albums=number_of_albums)
 
-@app.route('/editAlbum<int:albumId>/')
+@app.route('/catalog/<int:albumId>editAlbum/')
 def editAlbum(albumId):
 
 	# check if the user is logged in.
