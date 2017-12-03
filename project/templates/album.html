@@ -19,7 +19,7 @@
 			<div class="services">
 				<div class="desc">
 					{% if 'username' in session %}
-					<h4><a href="#">Add Album</a></h4>
+					<h4><a href="{{url_for('addAlbum')}}">Add Album</a></h4>
 					{% endif %}
 					<h3>Albums</h3>
 					<ul>

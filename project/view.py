@@ -211,6 +211,7 @@ def homePage():
     albums = session.query(Album).all()
     return render_template('album.html', music_bands = bands, albums = albums)
 
+# Route for showing all the albums by a band.
 @app.route('/catalog/<string:music_band_name>/albums/')
 def showBandAlbums(music_band_name):
 
@@ -234,8 +235,51 @@ def showBandAlbums(music_band_name):
 
 	return render_template('showAlbum.html', currentBand=current_music_band, albums=albums, music_bands=music_bands, number_of_albums=number_of_albums)
 
+# Route for adding an album.
+@app.route('/catalog/add_album/', methods=['GET', 'POST'])
+def addAlbum():
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
+
+	bands = session.query(Music_Band).all()
+	if request.method == 'POST':
+		print "reached in adding albums"
+		print request.form['album_name']
+		print request.form['description']
+		print request.form['user_id']
+		print request.form['band']
+
+		if not request.form['album_name']:
+			return "mising name"
+		if not request.form['description']:
+			return "missing description" 
+		if not request.form['band']:
+			return "missing band"
+		if not request.form['user_id']:
+			return "Missing user_id"
+
+		print "reached here yay"
+		try:
+			band = session.query(Music_Band).filter_by(name=request.form['band']).one()
+			print band.name
+			session.add(Album(name=request.form['album_name'], description=request.form['description'], music_band_id=band.id, user_id=request.form['user_id']))
+			session.commit()
+			print "comitted"
+			newAlbum = session.query(Album).filter_by(name=request.form['album_name']).one()
+			print "new album:"
+			print newAlbum.name
+			flash("New Album was created")
+			return redirect(url_for('homePage'))
+		except:
+			return "some error while adding the album"
+
+	else:
+		return render_template('addAlbum.html', bands=bands)
+
+# Route for showing a particular album.
 @app.route('/catalog/<string:music_band_name>/<string:album_name>/')
 def showAlbumInfo(music_band_name, album_name):
+	print album_name
 	try:
 		album = session.query(Album).filter_by(name=album_name).one()
 	except:
