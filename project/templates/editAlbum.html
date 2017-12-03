@@ -6,21 +6,20 @@
 	<h3> Edit Album </h3>
 	<h4>{{album.name}}</h4>
 	</br>
-	<form method='POST' action="{{url_for('editAlbum')}}">
-		
+	<form method='POST' action="{{url_for('editAlbum', music_band_name = music_band_name, album_name = album.name)}}">
 		<h4> Album Name</h4>
-		<input type='text' placeholder="{{album.name}}" size=30>
+		<input type='text' name='albumName' placeholder="{{album.name}}" size=30>
 		</br>
 		<h4>Description</h4>
-		<input type='text' placeholder='Description' size=30>
+		<input type='text' name='description' placeholder='Description' size=30>
 		</br>
 		<h4> Music Band</h4>
-		<select>
+		<select name='band'>
 			{% for band in bands %}
 				<option value='{{band.name}}'>{{band.name}}</option>
 			{% endfor %}
 		</select>
-		<input type='submit' value='Submit'>
+		<button type='submit' value='Submit'>Submit</button>
 	</form>
 	<a href="{{url_for('homePage')}}">Cancel</a>
 </div>

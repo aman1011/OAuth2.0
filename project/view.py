@@ -243,8 +243,8 @@ def showAlbumInfo(music_band_name, album_name):
 
 	return render_template('showAlbumInfo.html', album=album, music_band_name=music_band_name)
 
-@app.route('/catalog/<string:albumName>edit/')
-def editAlbum(albumId):
+@app.route('/catalog/<string:music_band_name>/<string:album_name>/edit/', methods=['POST', 'GET'])
+def editAlbum(music_band_name, album_name):
 
 	# check if the user is logged in.
 	# if not then redirect to the login page
@@ -252,25 +252,37 @@ def editAlbum(albumId):
 		return redirect(url_for('showLogin'))
 
 	try:
-		toEditAlbum = session.query(Album).filter_by(id=albumId).one()
+		toEditAlbum = session.query(Album).filter_by(name=album_name).one()
 		bands = session.query(Music_Band).all()
 	except:
 		return "Could not get the album to edit"
-
+	print request
 	if request.method == 'POST':
-		if request.args.get('name'):
-			toEditAlbum.name = request.args.get('name')
-		if request.args.get('description'):
-			toEditAlbum.name = request.args.get('description')
-		if request.args.get('music_band_id'):
-			toEditAlbum.name = request.args.get('music_band_id')
+		print "reached in POST"
+		if request.form['albumName']:
+			print request.form['albumName']
+			toEditAlbum.name = request.form['albumName']
+		if request.form['description']:
+			print request.form['description']
+			toEditAlbum.description = request.form['description']
+		if request.form['band']:
+			print request.form['band']
+			music_band = session.query(Music_Band).filter_by(name=request.form['band']).one()
+			toEditAlbum.music_band_id = music_band.id
+		print toEditAlbum.name
+		print toEditAlbum.description
+		print toEditAlbum.music_band_id
 		session.add(toEditAlbum)
 		session.commit()
 		flash('The album' + toEditAlbum.name + 'was successfully edited')
 
-		return url_for('homePage')
+		return redirect(url_for('homePage'))
 	else:
-		return render_template('editAlbum.html', album=toEditAlbum, bands=bands)
+		print "edit album:"
+		print toEditAlbum.name
+		print "band:"
+		print bands
+		return render_template('editAlbum.html', album=toEditAlbum, bands=bands, music_band_name=music_band_name)
 
 if __name__ == '__main__':
     app.secret_key  = 'super_secret_key'

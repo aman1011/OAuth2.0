@@ -11,7 +11,7 @@
 	</div>
 	{% if 'username' in session %}
 		<div class="row">
-			<a href="">Edit</a>
+			<a href="{{url_for('editAlbum', music_band_name = music_band_name, album_name = album.name)}}">Edit</a>
 			<a href="">Delete</a>
 		</div>
 		</br>
