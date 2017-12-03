@@ -1,0 +1,14 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div>
+	<h3> Delete Album </h3>
+	<h4>{{album.name}}</h4>
+	</br>
+	<form method='POST' action="{{url_for('deleteAlbum', music_band_name = music_band_name, album_name = album.name)}}">
+		<button type='submit' value='Submit'>Delete</button>
+	</form>
+	<a href="{{url_for('homePage')}}">Cancel</a>
+</div>
+{% endblock %}

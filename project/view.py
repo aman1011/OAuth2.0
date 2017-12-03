@@ -284,6 +284,38 @@ def editAlbum(music_band_name, album_name):
 		print bands
 		return render_template('editAlbum.html', album=toEditAlbum, bands=bands, music_band_name=music_band_name)
 
+# Adding the deleting functionality.
+@app.route('/catalog/<string:music_band_name>/<string:album_name>/delete/', methods=['POST', 'GET'])
+def deleteAlbum(music_band_name, album_name):
+
+	# check if the user is logged in.
+	# if not then redirect to the login page
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
+
+	try:
+		toDeleteAlbum = session.query(Album).filter_by(name=album_name).one()
+		bands = session.query(Music_Band).all()
+	except:
+		return "Could not get the album to delete"
+	print request
+	if request.method == 'POST':
+		print "reached in POST"
+		print toDeleteAlbum.name
+		print toDeleteAlbum.description
+		print toDeleteAlbum.music_band_id
+		session.delete(toDeleteAlbum)
+		session.commit()
+		flash('The album' + toDeleteAlbum.name + 'was successfully deleted')
+
+		return redirect(url_for('homePage'))
+	else:
+		print "delete album:"
+		print toDeleteAlbum.name
+		print "bands:"
+		print bands
+		return render_template('deleteAlbum.html', album=toDeleteAlbum, bands=bands, music_band_name=music_band_name)
+
 if __name__ == '__main__':
     app.secret_key  = 'super_secret_key'
     app.debug = True
