@@ -3,6 +3,10 @@ from models import Base, Music_Band, Album, User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from httplib2 import Http
+from redis import Redis
+import time
+from functools import update_wrapper
+
 app = Flask(__name__)
 
 # login session.
@@ -25,6 +29,9 @@ engine = create_engine('sqlite:///musicbandswithalbums.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+# Redis code for limiting API call.
+redis = Redis()
 
 # create anti-forgery state token
 @app.route('/login')
@@ -389,6 +396,78 @@ def deleteAlbum(music_band_name, album_name):
 		print "bands:"
 		print bands
 		return render_template('deleteAlbum.html', album=toDeleteAlbum, bands=bands, music_band_name=music_band_name)
+
+# Rate limit code.
+class RateLimit(object):
+    expiration_window = 10
+
+    def __init__(self, key_prefix, limit, per, send_x_headers):
+        self.reset = (int(time.time()) // per) * per + per
+        self.key = key_prefix + str(self.reset)
+        self.limit = limit
+        self.per = per
+        self.send_x_headers = send_x_headers
+        p = redis.pipeline()
+        p.incr(self.key)
+        p.expireat(self.key, self.reset + self.expiration_window)
+        self.current = min(p.execute()[0], limit)
+
+    remaining = property(lambda x: x.limit - x.current)
+    over_limit = property(lambda x: x.current >= x.limit)
+
+def get_view_rate_limit():
+    return getattr(g, '_view_rate_limit', None)
+
+def on_over_limit(limit):
+    return (jsonify({'data':'You hit the rate limit','error':'429'}),429)
+
+def ratelimit(limit, per=300, send_x_headers=True,
+              over_limit=on_over_limit,
+              scope_func=lambda: request.remote_addr,
+              key_func=lambda: request.endpoint):
+    def decorator(f):
+        def rate_limited(*args, **kwargs):
+            key = 'rate-limit/%s/%s/' % (key_func(), scope_func())
+            rlimit = RateLimit(key, limit, per, send_x_headers)
+            g._view_rate_limit = rlimit
+            if over_limit is not None and rlimit.over_limit:
+                return over_limit(rlimit)
+            return f(*args, **kwargs)
+        return update_wrapper(rate_limited, f)
+    return decorator
+
+
+
+@app.after_request
+def inject_x_rate_headers(response):
+    limit = get_view_rate_limit()
+    if limit and limit.send_x_headers:
+        h = response.headers
+        h.add('X-RateLimit-Remaining', str(limit.remaining))
+        h.add('X-RateLimit-Limit', str(limit.limit))
+        h.add('X-RateLimit-Reset', str(limit.reset))
+    return response
+
+@app.route('/catalog/<string:music_band_name>/json/')
+@ratelimit(limit=30, per=60 * 1)
+
+# Adding the JSON routes for API output.
+@app.route('/catalog/<string:music_band_name>/json/')
+def musicBandJSON(music_band_name):
+	try:
+		music_band = session.query(Music_Band).filter_by(name=music_band_name).one()
+	except:
+		return "could not get the band"
+
+	# Get the albums for the above music_band.
+	try:
+		albums = session.query(Album).filter_by(music_band_id=music_band.id).all()
+	except:
+		return "could not get the albums for the music band"
+
+	return jsonify(Albums=[i.serialize for i in albums])
+
+
 
 if __name__ == '__main__':
     app.secret_key  = 'super_secret_key'
