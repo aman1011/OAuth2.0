@@ -8,6 +8,7 @@
 		<div class="col-md-4 animate-box">
 			<div class="services">
 				{% if 'username' in session %}
+				<p>{{session['username']}}</p>
 					<h4><a href="{{url_for('addMusicBand')}}">Add Music Band</a></h4>
 					{% endif %}
 
