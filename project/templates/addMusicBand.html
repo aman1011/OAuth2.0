@@ -1,0 +1,23 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div id="fh5co-services-section">
+	<div class="row">
+		<h3> Add Album </h3>
+		</br>
+		<form method='POST' action="{{url_for('addMusicBand')}}">
+			<h4> Album Name</h4>
+			<input type='text' name='music_band_name' placeholder="Music Band Name" size=30>
+			</br>
+			<h4>User Id</h4>
+			<input type='text' name='user_id' placeholder='User Id' size=30>
+			</br>
+			</br>
+			<button type='submit' value='Submit'>Submit</button>
+		</form>
+		</br>
+		<a href="{{url_for('homePage')}}">Cancel</a>
+	</div>
+</div>
+{% endblock %}

@@ -235,6 +235,36 @@ def showBandAlbums(music_band_name):
 
 	return render_template('showAlbum.html', currentBand=current_music_band, albums=albums, music_bands=music_bands, number_of_albums=number_of_albums)
 
+# Route for adding a band
+@app.route('/catalog/add_music_band/', methods=['GET', 'POST'])
+def addMusicBand():
+	if 'username' not in login_session:
+		return redirect(url_for('showLogin'))
+
+	if request.method == 'POST':
+		print "reached in adding music bands"
+		print request.form['music_band_name']
+		print request.form['user_id']
+
+		if not request.form['music_band_name']:
+			return "mising name"
+		if not request.form['user_id']:
+			return "Missing user_id"
+
+		try:
+			session.add(Music_Band(name=request.form['music_band_name'], user_id=request.form['user_id']))
+			session.commit()
+			new_music_band = session.query(Music_Band).filter_by(name=request.form['music_band_name']).one()
+			print "new album:"
+			print new_music_band.name
+			flash("New Music Band was created")
+			return redirect(url_for('homePage'))
+		except:
+			return "some error while adding the music band"
+
+	else:
+		return render_template('addMusicBand.html')
+
 # Route for adding an album.
 @app.route('/catalog/add_album/', methods=['GET', 'POST'])
 def addAlbum():
