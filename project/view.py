@@ -148,7 +148,7 @@ def gconnect():
     print login_session['picture']
     print login_session['email']
     print login_session['user_id']
-
+    flash("You have successfully logged in")
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -255,7 +255,7 @@ def fbconnect():
         login_session['user_id'] = newUser.id
 
     login_session['user_id'] = user.id
-
+    flash("You have successfully logged in")
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -452,7 +452,7 @@ def editAlbum(music_band_name, album_name):
         print toEditAlbum.music_band_id
         session.add(toEditAlbum)
         session.commit()
-        flash('The album' + toEditAlbum.name + 'was successfully edited')
+        flash('The album ' + toEditAlbum.name + 'was successfully edited')
 
         return redirect(url_for('homePage'))
     else:
@@ -484,7 +484,7 @@ def deleteAlbum(music_band_name, album_name):
         print toDeleteAlbum.music_band_id
         session.delete(toDeleteAlbum)
         session.commit()
-        flash('The album' + toDeleteAlbum.name + 'was successfully deleted')
+        flash('The album ' + toDeleteAlbum.name + 'was successfully deleted')
 
         return redirect(url_for('homePage'))
     else:
