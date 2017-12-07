@@ -551,8 +551,6 @@ def musicBandJSON(music_band_name):
 
     return jsonify(Albums=[i.serialize for i in albums])
 
-
-
 if __name__ == '__main__':
     app.secret_key  = 'super_secret_key'
     app.debug = True
