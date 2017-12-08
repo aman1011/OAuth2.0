@@ -433,6 +433,19 @@ def editAlbum(music_band_name, album_name):
 
     try:
         toEditAlbum = session.query(Album).filter_by(name=album_name).one()
+    except:
+        print 'return could not get the album to edit'
+    # check the authorization of the user. Check if he's
+    # the owner of the album. If not, flash him the message
+    # over his un-authorization and 
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    print user.email
+    print toEditAlbum.user_id
+    if user.id != toEditAlbum.user_id:
+        flash('Not authorized to edit the album')
+        return redirect(url_for('homePage'))
+
+    try:
         bands = session.query(Music_Band).all()
     except:
         return "Could not get the album to edit"
