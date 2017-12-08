@@ -491,6 +491,17 @@ def deleteAlbum(music_band_name, album_name):
         bands = session.query(Music_Band).all()
     except:
         return "Could not get the album to delete"
+
+    # check for the authorization of the code.Check if he's
+    # the owner of the album. If not, flash him the message
+    # over his un-authorization.
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    print user.email
+    print toDeleteAlbum.user_id
+    if user.id != toDeleteAlbum.user_id:
+        flash('Not authorized to delete the album')
+        return redirect(url_for('deleteAlbum', music_band_name=music_band_name, album_name=album_name))
+
     print request
     if request.method == 'POST':
         print "reached in POST"
@@ -507,7 +518,7 @@ def deleteAlbum(music_band_name, album_name):
         print toDeleteAlbum.name
         print "bands:"
         print bands
-        return render_template('deleteAlbum.html', album=toDeleteAlbum, bands=bands, music_band_name=music_band_name)
+        return render_template('homePage')
 
 
 @auth.verify_password
