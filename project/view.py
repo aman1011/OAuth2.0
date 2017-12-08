@@ -100,18 +100,13 @@ def gconnect():
 
     # Verify that its for the appropriate application.
     if result['issued_to'] != CLIENT_ID_GOOGLE:
-        response = make_repsonse(json.dumps(
+        response = make_response(json.dumps(
             'The clinet ID does not match with the token'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     stored_access_token = login_session.get('access_token')
-    print "stored access code: %s" % stored_access_token
-
     stored_gplus_id = login_session.get('gplus_id')
-    print "stored gplus: %s" % stored_gplus_id
-
-    print "credentials access code %s" % credentials.access_token
 
     # Now if there is no user present, the above values will be
     # empty meaning no user is logged in. In case, these values
@@ -127,14 +122,13 @@ def gconnect():
 
     login_session['access_token'] = access_token
     login_session['gplus_id'] = gplus_id
-    print login_session['gplus_id']
+
     # get user info from google api.
     userinfo_url = 'https://www.googleapis.com/oauth2/v1/userinfo'
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     result = requests.get(userinfo_url,
                           params=params)
     data = result.json()
-    print data
 
     login_session['provider'] = 'google'
     login_session['username'] = data['name']
@@ -151,7 +145,6 @@ def gconnect():
         user = None
 
     if user is None:
-        print "reached in None"
         session.add(User(
             username=login_session['username'],
             picture=login_session['picture'],
@@ -159,15 +152,8 @@ def gconnect():
         session.commit()
         newUser = session.query(User).filter_by(
             email=login_session['email']).one()
-        print newUser.username
-        print newUser.id
         login_session['user_id'] = newUser.id
 
-    print login_session['provider']
-    print login_session['username']
-    print login_session['picture']
-    print login_session['email']
-    print login_session['user_id']
     flash("You have successfully logged in")
     output = ''
     output += '<h1>Welcome, '
@@ -185,17 +171,14 @@ def gconnect():
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
-    print "reached in gdis"
 
     access_token = login_session.get('access_token')
-    print access_token
     if access_token is None:
         response = make_response(
             json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
-        print "reaching before response"
-        print response
         return response
+
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
@@ -203,7 +186,7 @@ def gdisconnect():
         response = make_response(json.dumps(
             'Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        print response
+
         return response
     else:
         response = make_response(json.dumps(
@@ -220,7 +203,6 @@ def fbconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     access_token = request.data
-    print "access token received %s " % access_token
 
     app_id = json.loads(open('fb_client_secrets.json', 'r').read())[
         'web']['app_id']
@@ -250,16 +232,12 @@ def fbconnect():
     url += 'access_token=%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-    # print "url sent for API access:%s"% url
-    # print "API JSON result: %s" % result
+
     data = json.loads(result)
     login_session['provider'] = 'facebook'
     login_session['username'] = data["name"]
     login_session['email'] = data["email"]
     login_session['facebook_id'] = data["id"]
-    print "facebook id in login_session"
-    print login_session['facebook_id']
-    print login_session['username']
 
     # The token must be stored in the login_session in order to properly logout
     login_session['access_token'] = token
@@ -277,8 +255,6 @@ def fbconnect():
     user = session.query(User).filter_by(
         email=login_session['email']).one()
     if not user:
-        print "reaching in no user"
-        print login_session['username']
         session.add(User(
             username=login_session['username'],
             picture=login_session['picture'],
@@ -306,7 +282,6 @@ def fbconnect():
 
 @app.route('/fbdisconnect')
 def fbdisconnect():
-    print login_session
     facebook_id = login_session['facebook_id']
 
     # The access token must me included to successfully logout
@@ -320,15 +295,12 @@ def fbdisconnect():
 
 @app.route('/disconnect')
 def disconnect():
-    print 'reached in disconnect'
     if 'provider' in login_session:
         if login_session['provider'] == 'google':
             gdisconnect()
-            print login_session['gplus_id']
             del login_session['gplus_id']
-            print login_session['access_token']
             del login_session['access_token']
-            print "deleted"
+
         if login_session['provider'] == 'facebook':
             fbdisconnect()
             del login_session['access_token']
@@ -343,14 +315,12 @@ def disconnect():
         return redirect(url_for('homePage'))
     else:
         flash('You were not logged in')
-        print 'you are not logged in'
         return redirect(url_for('homePage'))
 
 
 @app.route('/')
 @app.route('/catalog/')
 def homePage():
-    # print login_session['username']
     bands = session.query(Music_Band).all()
     albums = session.query(Album).all()
     return render_template('album.html',
@@ -363,13 +333,9 @@ def homePage():
 def showBandAlbums(music_band_name):
 
     music_bands = session.query(Music_Band).all()
-    print music_band_name
-    print music_bands[1].name
     try:
         current_music_band = session.query(Music_Band).filter_by(
             name=music_band_name).one()
-        print current_music_band.id
-        print current_music_band.name
     except:
         return "Could not get the band"
 
@@ -379,7 +345,6 @@ def showBandAlbums(music_band_name):
             music_band_id=current_music_band.id).all()
         number_of_albums = session.query(Album).filter_by(
             music_band_id=current_music_band.id).count()
-        print albums[0].name
     except:
         return "could not get the albums"
 
@@ -397,10 +362,6 @@ def addMusicBand():
         return redirect(url_for('showLogin'))
 
     if request.method == 'POST':
-        print "reached in adding music bands"
-        print request.form['music_band_name']
-        print request.form['user_id']
-
         if not request.form['music_band_name']:
             return "mising name"
         if not request.form['user_id']:
@@ -413,8 +374,6 @@ def addMusicBand():
             session.commit()
             new_music_band = session.query(Music_Band).filter_by(
                 name=request.form['music_band_name']).one()
-            print "new album:"
-            print new_music_band.name
             flash("New Music Band was created")
             return redirect(url_for('homePage'))
         except:
@@ -432,12 +391,6 @@ def addAlbum():
 
     bands = session.query(Music_Band).all()
     if request.method == 'POST':
-        print "reached in adding albums"
-        print request.form['album_name']
-        print request.form['description']
-        print request.form['user_id']
-        print request.form['band']
-
         if not request.form['album_name']:
             return "mising name"
         if not request.form['description']:
@@ -447,21 +400,16 @@ def addAlbum():
         if not request.form['user_id']:
             return "Missing user_id"
 
-        print "reached here yay"
         try:
             band = session.query(Music_Band).filter_by(
                 name=request.form['band']).one()
-            print band.name
             session.add(Album(name=request.form['album_name'],
                               description=request.form['description'],
                               music_band_id=band.id,
                               user_id=request.form['user_id']))
             session.commit()
-            print "comitted"
             newAlbum = session.query(Album).filter_by(
                 name=request.form['album_name']).one()
-            print "new album:"
-            print newAlbum.name
             flash("New Album was created")
             return redirect(url_for('homePage'))
         except:
@@ -474,7 +422,6 @@ def addAlbum():
 # Route for showing a particular album.
 @app.route('/catalog/<string:music_band_name>/<string:album_name>/')
 def showAlbumInfo(music_band_name, album_name):
-    print album_name
     try:
         album = session.query(Album).filter_by(name=album_name).one()
     except:
@@ -494,19 +441,12 @@ def editAlbum(music_band_name, album_name):
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
 
-    try:
-        toEditAlbum = session.query(Album).filter_by(
-            name=album_name).one()
-    except:
-        print 'return could not get the album to edit'
+    toEditAlbum = session.query(Album).filter_by(
+        name=album_name).one()
 
-    # check the authorization of the user. Check if he's
-    # the owner of the album. If not, flash him the message
-    # over his un-authorization.
     user = session.query(User).filter_by(
         email=login_session['email']).one()
-    print user.email
-    print toEditAlbum.user_id
+
     if user.id != toEditAlbum.user_id:
         flash('Not authorized to edit the album')
         return redirect(url_for('homePage'))
@@ -515,33 +455,21 @@ def editAlbum(music_band_name, album_name):
         bands = session.query(Music_Band).all()
     except:
         return "Could not get the album to edit"
-    print request
     if request.method == 'POST':
-        print "reached in POST"
         if request.form['albumName']:
-            print request.form['albumName']
             toEditAlbum.name = request.form['albumName']
         if request.form['description']:
-            print request.form['description']
             toEditAlbum.description = request.form['description']
         if request.form['band']:
-            print request.form['band']
             music_band = session.query(Music_Band).filter_by(
                 name=request.form['band']).one()
             toEditAlbum.music_band_id = music_band.id
-        print toEditAlbum.name
-        print toEditAlbum.description
-        print toEditAlbum.music_band_id
         session.add(toEditAlbum)
         session.commit()
         flash('The album ' + toEditAlbum.name + 'was successfully edited')
 
         return redirect(url_for('homePage'))
     else:
-        print "edit album:"
-        print toEditAlbum.name
-        print "band:"
-        print bands
         return render_template('editAlbum.html',
                                album=toEditAlbum, bands=bands,
                                music_band_name=music_band_name)
@@ -567,36 +495,24 @@ def deleteAlbum(music_band_name, album_name):
     # the owner of the album. If not, flash him the message
     # over his un-authorization.
     user = session.query(User).filter_by(email=login_session['email']).one()
-    print user.email
-    print toDeleteAlbum.user_id
     if user.id != toDeleteAlbum.user_id:
         flash('Not authorized to delete the album')
         return redirect(url_for('deleteAlbum',
                                 music_band_name=music_band_name,
                                 album_name=album_name))
 
-    print request
     if request.method == 'POST':
-        print "reached in POST"
-        print toDeleteAlbum.name
-        print toDeleteAlbum.description
-        print toDeleteAlbum.music_band_id
         session.delete(toDeleteAlbum)
         session.commit()
         flash('The album ' + toDeleteAlbum.name + 'was successfully deleted')
 
         return redirect(url_for('homePage'))
     else:
-        print "delete album:"
-        print toDeleteAlbum.name
-        print "bands:"
-        print bands
         return render_template('homePage')
 
 
 @auth.verify_password
 def verify_password(username, password):
-    print 'reaching here'
     user = session.query(User).filter_by(username=username).first()
     if not user or not user.verify_password(password):
         return False
@@ -609,11 +525,9 @@ def new_user():
     username = request.json.get('username')
     password = request.json.get('password')
     if username is None or password is None:
-        print "missing arguments"
         abort(400)
 
     if session.query(User).filter_by(username=username).first() is not None:
-        print "existing user"
         user = session.query(User).filter_by(username=username).first()
         return jsonify({'message': 'user already exists'}), 200, {
             'Location': url_for('get_user', id=user.id, _external=True)

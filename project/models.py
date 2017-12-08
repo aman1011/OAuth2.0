@@ -5,8 +5,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import relationship, sessionmaker
 from passlib.apps import custom_app_context as pwd_context
 import random, string
-from itsdangerous import(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
-
 
 
 Base = declarative_base()
@@ -40,7 +38,7 @@ class Music_Band(Base):
 	id = Column(Integer, primary_key = True)
 	name = Column(String(32), index=True)
 	user_id = Column(Integer, ForeignKey('user.id'))
-	user = relationship(User, cascade="save-update, delete")
+	user = relationship(User, cascade="save-update")
 
 	@property
 	def serialize(self):
@@ -57,7 +55,7 @@ class Album(Base):
 	music_band_id = Column(Integer, ForeignKey('music_band.id'))
 	music_band = relationship(Music_Band, cascade="save-update, delete")
 	user_id = Column(Integer, ForeignKey('user.id'))
-	user = relationship(User, cascade="save-update, delete")
+	user = relationship(User)
 
 	@property
 	def serialize(self):
