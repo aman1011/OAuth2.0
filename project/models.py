@@ -40,7 +40,7 @@ class Music_Band(Base):
 	id = Column(Integer, primary_key = True)
 	name = Column(String(32), index=True)
 	user_id = Column(Integer, ForeignKey('user.id'))
-	user = relationship(User)
+	user = relationship(User, cascade="save-update, delete")
 
 	@property
 	def serialize(self):
@@ -55,9 +55,9 @@ class Album(Base):
 	name = Column(String(32), index=True)
 	description = Column(String(400))
 	music_band_id = Column(Integer, ForeignKey('music_band.id'))
-	music_band = relationship(Music_Band)
+	music_band = relationship(Music_Band, cascade="save-update, delete")
 	user_id = Column(Integer, ForeignKey('user.id'))
-	user = relationship(User)
+	user = relationship(User, cascade="save-update, delete")
 
 	@property
 	def serialize(self):
